@@ -1,8 +1,7 @@
 use crate::domain::error::DomainError;
 
-
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ValidationCode (String);
+pub struct ValidationCode(String);
 
 impl AsRef<str> for ValidationCode {
     fn as_ref(&self) -> &str {
@@ -11,15 +10,14 @@ impl AsRef<str> for ValidationCode {
 }
 
 impl ValidationCode {
-    pub fn parse(code: String) -> Result<Self, DomainError> {
+    pub fn new(code: String) -> Result<Self, DomainError> {
+        if code.len() != 6 || !code.chars().all(|c| c.is_ascii_digit()) {
+            return Err(DomainError::InternalError("验证码格式错误".to_string()));
+        }
         Ok(ValidationCode(code))
     }
 
     pub fn from_trusted(code: String) -> Self {
         ValidationCode(code)
-    }
-    
-    pub fn verify(&self, code: String) -> bool {
-        code == self.0
     }
 }

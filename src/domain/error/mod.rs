@@ -6,8 +6,12 @@ pub enum DomainError {
     InvalidEmailFormat,
     #[error("弱密码")]
     WeakPassword,
-    #[error("内部错误")]
-    InternalError,
+    #[error("验证码无效")]
+    InvalidValidationCode,
+    #[error("内部错误: {0}")]
+    InternalError(String),
+    #[error(transparent)]
+    Repository(#[from] RepositoryError),
 }
 
 #[derive(Error, Debug, PartialEq)]
