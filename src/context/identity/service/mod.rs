@@ -1,4 +1,4 @@
 pub mod password_hasher;
-pub mod auth;
+pub mod session;
 pub mod code;
 pub mod user;
