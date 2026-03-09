@@ -26,7 +26,6 @@ impl ValidationCodeRecord {
         }
     }
 
-    /// 核心业务逻辑：校验验证码是否匹配且未过期
     pub fn is_valid(&self, attempt: &ValidationCode) -> bool {
         !self.is_expired() && &self.code == attempt
     }

@@ -1,11 +1,12 @@
-use crate::shared::domain::error::{DomainError, RepositoryError};
+use crate::shared::error::{RepositoryError};
 use async_trait::async_trait;
 use super::super::value_object::{email::Email, validation_code::ValidationCode};
 use super::super::entity::validation_code::ValidationCodeRecord;
+use super::super::error::DomainError;
 
 #[async_trait]
 pub trait ICodeSender: Send + Sync {
-    async fn send(&self, email: &Email, code: &ValidationCode) -> Result<(), DomainError>;
+    async fn send(&self, code: &ValidationCodeRecord) -> Result<(), DomainError>;
 }
 
 #[async_trait]

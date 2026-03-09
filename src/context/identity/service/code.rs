@@ -1,10 +1,7 @@
-use crate::shared::domain::{
-    error::DomainError, 
-};
-
 use super::super::{
+    error::DomainError,
     entity::validation_code::ValidationCodeRecord,
-    repository::code::ICodeRepository, 
+    repository::code::ICodeRepository,
     value_object::{email::Email, validation_code::ValidationCode}
 };
 
@@ -29,13 +26,13 @@ impl CodeService {
 
     pub async fn verify_code(&self, email: &Email, attempt: &ValidationCode) -> Result<bool, DomainError> {
         let record = self.code_repository.find(email).await?;
-        
+
         if let Some(record) = record && record.is_valid(attempt) {
             // 校验成功，用完即删
             self.code_repository.delete(email).await?;
             return Ok(true);
         }
-        
+
         Ok(false)
     }
 }

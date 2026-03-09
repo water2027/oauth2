@@ -1,10 +1,11 @@
 use super::super::entity::user::User;
 use super::super::value_object::{email::Email, user_id::UserID};
-use crate::shared::domain::error::RepositoryError;
+use crate::shared::error::RepositoryError;
 use async_trait::async_trait;
 
 #[async_trait]
 pub trait IUserRepository: Send + Sync {
+    async fn generate_id(&self) -> Result<UserID, RepositoryError>;
     async fn find_by_id(&self, user_id: &UserID) -> Result<Option<User>, RepositoryError>;
     async fn is_email_registered(&self, email: &Email) -> Result<bool, RepositoryError>;
     async fn create(&self, user: &User) -> Result<(), RepositoryError>;

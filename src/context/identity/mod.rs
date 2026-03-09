@@ -4,3 +4,4 @@ pub mod value_object;
 pub mod service;
 pub mod infrastructure;
 pub mod repository;
+pub mod error;

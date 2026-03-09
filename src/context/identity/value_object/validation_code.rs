@@ -1,4 +1,4 @@
-use crate::shared::domain::error::DomainError;
+use super::super::error::DomainError;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ValidationCode(String);
