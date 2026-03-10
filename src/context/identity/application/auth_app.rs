@@ -1,3 +1,5 @@
+use crate::context::identity::entity::session::Session;
+use crate::context::identity::service::session::SessionService;
 use crate::context::identity::service::user::UserService;
 use super::super::error::DomainError;
 
@@ -5,35 +7,38 @@ use super::command::{LoginCommand, RegisterCommand};
 use super::super::service::{code::CodeService};
 
 pub struct AuthAppService {
+    session_service: SessionService,
     user_service: UserService,
     code_service: CodeService,
 }
 
 impl AuthAppService {
-    pub fn new(user_service: UserService, code_service: CodeService) -> Self {
-        Self { user_service, code_service }
+    pub fn new(session_service: SessionService, user_service: UserService, code_service: CodeService) -> Self {
+        Self { session_service, user_service, code_service }
     }
 
-    pub async fn login(&self, cmd: LoginCommand) -> Result<(), DomainError> {
+    pub async fn login(&self, cmd: LoginCommand) -> Result<Session, DomainError> {
         let LoginCommand { email, password } = cmd;
 
-        self.user_service.authenticate(email, password).await?;
+        let user = self.user_service.authenticate(email, password).await?;
         
-        // TODO: 颁发 cookie session
-
-        Ok(())
+        let session = self.session_service.create_session(user.user_id).await?;
+        
+        Ok(session)
     }
 
-    pub async fn register(&self, cmd: RegisterCommand) -> Result<(), DomainError> {
+    pub async fn register(&self, cmd: RegisterCommand) -> Result<Session, DomainError> {
         let RegisterCommand { username, email, password, password_confirm, validation_code } = cmd;
 
-        self.code_service.verify_code(&email, &validation_code).await?;
+        if !self.code_service.verify_code(&email, &validation_code).await? {
+            return Err(DomainError::InvalidValidationCode);
+        }
 
         self.user_service.can_create(&email, &password, &password_confirm).await?;
-        self.user_service.create_user(email, password, username).await?;
+        let user = self.user_service.create_user(email, password, username).await?;
 
-        // TODO: 颁发 cookie session
-        
-        Ok(())
+        let session = self.session_service.create_session(user.user_id).await?;
+
+        Ok(session)
     }
 }

@@ -1,15 +1,15 @@
 use super::super::service::password_hasher::{IPasswordHasher};
-
+use std::sync::Arc;
 use super::super::{entity::user::User, repository::user::IUserRepository, value_object::{email::Email, raw_password::RawPassword, username::Username}, error::DomainError};
 
 
 pub struct UserService {
-    user_repository: Box<dyn IUserRepository>,
-    password_hasher: Box<dyn IPasswordHasher>
+    user_repository: Arc<dyn IUserRepository>,
+    password_hasher: Arc<dyn IPasswordHasher>
 }
 
 impl UserService {
-    pub fn new(user_repository: Box<dyn IUserRepository>, password_hasher: Box<dyn IPasswordHasher>) -> Self {
+    pub fn new(user_repository: Arc<dyn IUserRepository>, password_hasher: Arc<dyn IPasswordHasher>) -> Self {
         Self { user_repository, password_hasher }
     }
 
