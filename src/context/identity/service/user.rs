@@ -1,20 +1,21 @@
 use super::super::service::password_hasher::{IPasswordHasher};
 use std::sync::Arc;
-use super::super::{entity::user::User, repository::user::IUserRepository, value_object::{email::Email, raw_password::RawPassword, username::Username}, error::DomainError};
+use super::super::{entity::user::User, repository::user::{IUserRepository, IUserIDGenerator}, value_object::{email::Email, raw_password::RawPassword, username::Username}, error::DomainError};
 
 
 pub struct UserService {
     user_repository: Arc<dyn IUserRepository>,
+    user_id_generator: Arc<dyn IUserIDGenerator>,
     password_hasher: Arc<dyn IPasswordHasher>
 }
 
 impl UserService {
-    pub fn new(user_repository: Arc<dyn IUserRepository>, password_hasher: Arc<dyn IPasswordHasher>) -> Self {
-        Self { user_repository, password_hasher }
+    pub fn new(user_repository: Arc<dyn IUserRepository>, user_id_generator: Arc<dyn IUserIDGenerator>, password_hasher: Arc<dyn IPasswordHasher>) -> Self {
+        Self { user_repository, user_id_generator, password_hasher }
     }
 
     pub async fn create_user(&self, email: Email, password: RawPassword, username: Username) -> Result<User, DomainError> {
-        let user_id = self.user_repository.generate_id().await?;
+        let user_id = self.user_id_generator.generate_id();
         let hashed_password = self.password_hasher.hash(password)?;
         let user = User::new(user_id, username, email, hashed_password);
         self.user_repository.create(&user).await?;

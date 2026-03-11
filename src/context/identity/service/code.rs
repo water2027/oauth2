@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use crate::context::identity::repository::code::ICodeSender;
+use crate::context::identity::repository::code::{ICodeGenerator, ICodeSender};
 
 use super::super::{
     error::DomainError,
@@ -12,16 +12,17 @@ use super::super::{
 
 pub struct CodeService {
     code_repository: Arc<dyn ICodeRepository>,
-    code_sender: Arc<dyn ICodeSender>
+    code_sender: Arc<dyn ICodeSender>,
+    code_generator: Arc<dyn ICodeGenerator>
 }
 
 impl CodeService {
-    pub fn new(code_repository: Arc<dyn ICodeRepository>, code_sender: Arc<dyn ICodeSender>) -> Self {
-        Self { code_repository, code_sender }
+    pub fn new(code_repository: Arc<dyn ICodeRepository>, code_sender: Arc<dyn ICodeSender>, code_generator: Arc<dyn ICodeGenerator>) -> Self {
+        Self { code_repository, code_sender, code_generator }
     }
 
     pub async fn send_code(&self, email: &Email) -> Result<(), DomainError> {
-        let code = self.code_repository.generate_code();
+        let code = self.code_generator.generate_code()?;
         let record = ValidationCodeRecord::new(email.clone(), code, 300); // 5分钟过期
         self.code_sender.send(&record).await?;
         self.code_repository

@@ -1,6 +1,7 @@
+use serde::{Serialize, Deserialize};
 use super::super::error::DomainError;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ValidationCode(String);
 
 impl AsRef<str> for ValidationCode {

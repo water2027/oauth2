@@ -1,16 +1,17 @@
-use std::time::SystemTime;
+use chrono::{DateTime, Utc, Duration};
+use serde::{Serialize, Deserialize};
 use super::super::value_object::{email::Email, validation_code::ValidationCode};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ValidationCodeRecord {
     pub email: Email,
     pub code: ValidationCode,
-    pub expires_at: SystemTime,
+    pub expires_at: DateTime<Utc>,
 }
 
 impl ValidationCodeRecord {
     pub fn new(email: Email, code: ValidationCode, ttl_secs: u64) -> Self {
-        let expires_at = SystemTime::now() + std::time::Duration::from_secs(ttl_secs);
+        let expires_at = Utc::now() + Duration::seconds(ttl_secs as i64);
         Self {
             email,
             code,
@@ -18,7 +19,7 @@ impl ValidationCodeRecord {
         }
     }
 
-    pub fn from_trusted(email: Email, code: ValidationCode, expires_at: SystemTime) -> Self {
+    pub fn from_trusted(email: Email, code: ValidationCode, expires_at: DateTime<Utc>) -> Self {
         Self {
             email,
             code,
@@ -31,6 +32,6 @@ impl ValidationCodeRecord {
     }
 
     pub fn is_expired(&self) -> bool {
-        SystemTime::now() > self.expires_at
+        Utc::now() > self.expires_at
     }
 }
