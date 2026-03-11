@@ -3,7 +3,7 @@ use super::super::value_object::{email::Email, user_id::UserID};
 use crate::shared::error::RepositoryError;
 use async_trait::async_trait;
 
-pub trait IUserIDGenerator {
+pub trait IUserIDGenerator: Send + Sync {
     fn generate_id(&self) -> UserID;
 }
 
