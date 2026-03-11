@@ -4,7 +4,7 @@ use super::super::entity::session::Session;
 use crate::shared::error::RepositoryError;
 
 #[async_trait]
-pub trait SessionRepository {
+pub trait ISessionRepository: Send + Sync {
     async fn generate_cookie(&self) -> Result<String, RepositoryError>;
     async fn get_session(&self, cookie: &str) -> Result<Option<Session>, RepositoryError>;
     async fn delete_session(&self, cookie: &str) -> Result<(), RepositoryError>;

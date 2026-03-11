@@ -1,17 +1,17 @@
 use std::sync::Arc;
 use crate::context::identity::{
-    entity::session::{Session},
+    entity::session::Session,
     error::DomainError,
-    repository::session::SessionRepository,
+    repository::session::ISessionRepository,
     value_object::user_id::UserID,
 };
 
 pub struct SessionService {
-    session_repository: Arc<dyn SessionRepository>
+    session_repository: Arc<dyn ISessionRepository>
 }
 
 impl SessionService {
-    pub fn new(session_repository: Arc<dyn SessionRepository>) -> Self {
+    pub fn new(session_repository: Arc<dyn ISessionRepository>) -> Self {
         Self { session_repository }
     }
 

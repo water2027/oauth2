@@ -5,8 +5,6 @@ use crate::context::identity::value_object::hashed_password::HashedPassword;
 use crate::context::identity::value_object::username::Username;
 use crate::shared::error::RepositoryError;
 use async_trait::async_trait;
-use sqlx::types::uuid;
-use uuid::Uuid;
 
 pub struct SqlxUserRepository {
     pool: sqlx::PgPool,
@@ -46,12 +44,12 @@ impl IUserRepository for SqlxUserRepository {
         }
     }
     async fn is_email_registered(&self, email: &Email) -> Result<bool, RepositoryError> {
-            let count: (i64,) = sqlx::query_as("SELECT COUNT(*) FROM users WHERE email = $1")
+            let row: (bool,) = sqlx::query_as("SELECT EXISTS(SELECT 1 FROM users WHERE email = $1)")
                 .bind(email.as_ref())
                 .fetch_one(&self.pool)
                 .await
                 .map_err(|e| RepositoryError::InternalError(format!("sqlx: {}", e.to_string())))?;
-            Ok(count.0 > 0)
+            Ok(row.0)
     }
     async fn create(&self, user: &User) -> Result<(), RepositoryError> {
             sqlx::query("INSERT INTO users (id, username, email, password) VALUES ($1, $2, $3, $4)")

@@ -1,7 +1,7 @@
 use async_trait::async_trait;
 use super::super::entity::session::Session;
 
-use crate::{context::identity::{repository::session::SessionRepository, value_object::user_id::UserID}, shared::{error::RepositoryError, utils::generate_random_string}};
+use crate::{context::identity::{repository::session::ISessionRepository, value_object::user_id::UserID}, shared::{error::RepositoryError, utils::generate_random_string}};
 
 pub struct SqlxSessionRepository {
     pool: sqlx::PgPool,
@@ -20,7 +20,7 @@ struct SessionRow {
 }
 
 #[async_trait]
-impl SessionRepository for SqlxSessionRepository {
+impl ISessionRepository for SqlxSessionRepository {
     async fn generate_cookie(&self) -> Result<String, RepositoryError> {
         Ok(generate_random_string(32))
     }
