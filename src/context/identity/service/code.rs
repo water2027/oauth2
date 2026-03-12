@@ -20,6 +20,15 @@ impl CodeService {
     pub fn new(code_repository: Arc<dyn ICodeRepository>, code_sender: Arc<dyn ICodeSender>, code_generator: Arc<dyn ICodeGenerator>) -> Self {
         Self { code_repository, code_sender, code_generator }
     }
+    
+    pub async fn can_send_code(&self, email: &Email) -> Result<bool, DomainError> {
+        if let Some(record) = self.code_repository.find(email).await? {
+            if !record.is_expired() {
+                return Ok(false);
+            }
+        }
+        Ok(true)
+    }
 
     pub async fn send_code(&self, email: &Email) -> Result<(), DomainError> {
         let code = self.code_generator.generate_code()?;

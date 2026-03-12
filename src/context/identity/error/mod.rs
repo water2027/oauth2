@@ -27,6 +27,10 @@ pub enum DomainError {
     #[strum(props(code = "4006"))]
     #[error("验证码无效")]
     InvalidValidationCode,
+    
+    #[strum(props(code = "4007"))]
+    #[error("请求过于频繁，请稍后再试")]
+    TooManyRequests,
 
     #[strum(props(code = "4005"))]
     #[error("身份验证失败")]

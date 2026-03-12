@@ -49,13 +49,20 @@ impl ISessionRepository for SqlxSessionRepository {
             Ok(())
     }
     async fn save_session(&self, session: &Session) -> Result<(), RepositoryError> {
-        sqlx::query("INSERT INTO sessions (cookie, user_id, expires_at) VALUES ($1, $2, $3)")
-            .bind(&session.cookie)
-            .bind(&session.user_id.as_ref())
-            .bind(session.expires_at)
-            .execute(&self.pool)
-            .await
-            .map_err(|e| RepositoryError::InternalError(format!("sqlx: {}", e.to_string())))?;
+        sqlx::query(
+            r#"
+            INSERT INTO sessions (cookie, user_id, expires_at)
+            VALUES ($1, $2, $3)
+            ON CONFLICT (cookie)
+            DO UPDATE SET expires_at = EXCLUDED.expires_at
+            "#
+        )
+        .bind(&session.cookie)
+        .bind(&session.user_id.as_ref())
+        .bind(session.expires_at)
+        .execute(&self.pool)
+        .await
+        .map_err(|e| RepositoryError::InternalError(format!("sqlx: {}", e.to_string())))?;
         Ok(())
     }
 }

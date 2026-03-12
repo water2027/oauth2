@@ -37,4 +37,9 @@ impl SessionService {
         }
         Ok(())
     }
+    
+    pub async fn delete_session(&self, cookie: &str) -> Result<(), DomainError> {
+        self.session_repository.delete_session(cookie).await?;
+        Ok(())
+    }
 }

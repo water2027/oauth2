@@ -4,6 +4,7 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
     Json,
+    middleware::from_fn_with_state,
 };
 use serde::Serialize;
 use std::sync::Arc;
@@ -13,6 +14,7 @@ use async_trait::async_trait;
 use crate::context::identity::application::auth_app::AuthAppService;
 use crate::presentation::IHttpEngine;
 
+pub mod middleware;
 pub mod auth;
 
 /// 统一响应结构
@@ -69,10 +71,24 @@ impl AxumHttpEngine {
 #[async_trait]
 impl IHttpEngine for AxumHttpEngine {
     async fn start(&self, host: &str, port: u16) -> Result<(), Box<dyn std::error::Error>> {
-        // 配置路由
-        let app = Router::new()
+        // 分离公开路由和受保护路由
+        let public_routes = Router::new()
             .route("/auth/register", post(auth::register))
-            .route("/auth/login", post(auth::login))
+            .route("/auth/login", post(auth::login));
+
+        let protected_routes = Router::new()
+            .route("/auth/logout", post(auth::logout))
+            // 可以继续添加更多受保护路由
+            // .route("/me", get(auth::me))
+            .route_layer(from_fn_with_state(
+                self.auth_app_service.clone(),
+                middleware::auth::auth_middleware,
+            ));
+
+        // 合并路由并注入状态
+        let app = Router::new()
+            .merge(public_routes)
+            .merge(protected_routes)
             .with_state(self.auth_app_service.clone());
 
         // 启动服务器

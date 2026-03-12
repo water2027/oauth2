@@ -2,6 +2,7 @@ use crate::context::identity::value_object::user_id::UserID;
 
 const SESSION_MAX_AGE: i64 = 7 * 24 * 3600; // 7 days
 
+#[derive(Clone)]
 pub struct Session {
     pub user_id: UserID,
     pub cookie: String,

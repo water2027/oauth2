@@ -3,13 +3,17 @@ use axum::{
     Json,
     http::StatusCode,
     response::IntoResponse,
+    Extension,
 };
+use axum_extra::extract::cookie::{Cookie, CookieJar};
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
+use time::Duration;
 
 use crate::context::identity::application::auth_app::AuthAppService;
 use crate::context::identity::application::command::{LoginCommand, RegisterCommand};
 use crate::context::identity::error::DomainError;
+use crate::context::identity::entity::session::Session;
 use crate::context::identity::value_object::{
     email::Email,
     raw_password::RawPassword,
@@ -35,12 +39,12 @@ pub struct LoginRequest {
 
 #[derive(Serialize)]
 pub struct SessionResponse {
-    pub cookie: String,
     pub user_id: String,
 }
 
 pub async fn register(
     State(app_service): State<Arc<AuthAppService>>,
+    jar: CookieJar,
     Json(payload): Json<RegisterRequest>,
 ) -> impl IntoResponse {
     let cmd = match (
@@ -57,20 +61,27 @@ pub async fn register(
             password_confirm: pwc,
             validation_code: vc,
         },
-        _ => return fail(StatusCode::BAD_REQUEST, 400, "参数格式错误"),
+        _ => return (jar, fail::<SessionResponse>(StatusCode::BAD_REQUEST, 400, "参数格式错误")).into_response(),
     };
 
     match app_service.register(cmd).await {
-        Ok(session) => success(SessionResponse {
-            cookie: session.cookie,
-            user_id: session.user_id.as_ref().to_string(),
-        }),
-        Err(e) => to_api_error(e),
+        Ok(session) => {
+            let cookie = Cookie::build(("session", session.cookie))
+                .path("/")
+                .http_only(true)
+                .max_age(Duration::seconds(7 * 24 * 3600))
+                .build();
+            (jar.add(cookie), success(SessionResponse {
+                user_id: session.user_id.as_ref().to_string(),
+            })).into_response()
+        }
+        Err(e) => (jar, to_api_error::<SessionResponse>(e)).into_response(),
     }
 }
 
 pub async fn login(
     State(app_service): State<Arc<AuthAppService>>,
+    jar: CookieJar,
     Json(payload): Json<LoginRequest>,
 ) -> impl IntoResponse {
     let cmd = match (
@@ -78,16 +89,32 @@ pub async fn login(
         RawPassword::new(payload.password),
     ) {
         (Ok(em), Ok(pw)) => LoginCommand { email: em, password: pw },
-        _ => return fail(StatusCode::BAD_REQUEST, 400, "参数格式错误"),
+        _ => return (jar, fail::<SessionResponse>(StatusCode::BAD_REQUEST, 400, "参数格式错误")).into_response(),
     };
 
     match app_service.login(cmd).await {
-        Ok(session) => success(SessionResponse {
-            cookie: session.cookie,
-            user_id: session.user_id.as_ref().to_string(),
-        }),
-        Err(e) => to_api_error(e),
+        Ok(session) => {
+            let cookie = Cookie::build(("session", session.cookie))
+                .path("/")
+                .http_only(true)
+                .max_age(Duration::seconds(7 * 24 * 3600))
+                .build();
+            (jar.add(cookie), success(SessionResponse {
+                user_id: session.user_id.as_ref().to_string(),
+            })).into_response()
+        }
+        Err(e) => (jar, to_api_error::<SessionResponse>(e)).into_response(),
     }
+}
+
+pub async fn logout(
+    State(app_service): State<Arc<AuthAppService>>,
+    Extension(session): Extension<Session>,
+    jar: CookieJar,
+) -> impl IntoResponse {
+    // 因为中间件已经校验过 session，这里直接使用即可
+    let _ = app_service.logout(&session.cookie).await;
+    (jar.remove(Cookie::from("session")), success(())).into_response()
 }
 
 fn to_api_error<T: Serialize>(err: DomainError) -> ApiResult<T> {

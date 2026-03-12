@@ -1,6 +1,7 @@
 use crate::context::identity::entity::session::Session;
 use crate::context::identity::service::session::SessionService;
 use crate::context::identity::service::user::UserService;
+use crate::context::identity::value_object::email::Email;
 use super::super::error::DomainError;
 
 use super::command::{LoginCommand, RegisterCommand};
@@ -39,6 +40,24 @@ impl AuthAppService {
 
         let session = self.session_service.create_session(user.user_id).await?;
 
+        Ok(session)
+    }
+    
+    pub async fn logout(&self, cookie: &str) -> Result<(), DomainError> {
+        self.session_service.delete_session(cookie).await?;
+        Ok(())
+    }
+    
+    pub async fn send_validation_code(&self, email: Email) -> Result<(), DomainError> {
+        if !self.code_service.can_send_code(&email).await? {
+            return Err(DomainError::TooManyRequests);
+        }
+        self.code_service.send_code(&email).await?;
+        Ok(())
+    }
+    
+    pub async fn verify(&self, cookie: &str) -> Result<Option<Session>, DomainError> {
+        let session = self.session_service.verify_session(cookie).await?;
         Ok(session)
     }
 }
