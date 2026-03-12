@@ -42,4 +42,9 @@ impl SessionService {
         self.session_repository.delete_session(cookie).await?;
         Ok(())
     }
+    
+    pub async fn revoke(&self, user_id: &UserID) -> Result<(), DomainError> {
+        self.session_repository.delete_user_sessions(&user_id).await?;
+        Ok(())
+    }
 }

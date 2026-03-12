@@ -1,5 +1,5 @@
 use axum::{
-    routing::post,
+    routing::{get, post},
     Router,
     http::StatusCode,
     response::{IntoResponse, Response},
@@ -74,12 +74,14 @@ impl IHttpEngine for AxumHttpEngine {
         // 分离公开路由和受保护路由
         let public_routes = Router::new()
             .route("/auth/register", post(auth::register))
-            .route("/auth/login", post(auth::login));
+            .route("/auth/login", post(auth::login))
+            .route("/auth/send-code", post(auth::send_code))
+            .route("/auth/reset-password", post(auth::reset_password));
 
         let protected_routes = Router::new()
             .route("/auth/logout", post(auth::logout))
+            .route("/auth/me", get(auth::me))
             // 可以继续添加更多受保护路由
-            // .route("/me", get(auth::me))
             .route_layer(from_fn_with_state(
                 self.auth_app_service.clone(),
                 middleware::auth::auth_middleware,

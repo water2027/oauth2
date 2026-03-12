@@ -65,6 +65,15 @@ impl ISessionRepository for SqlxSessionRepository {
         .map_err(|e| RepositoryError::InternalError(format!("sqlx: {}", e.to_string())))?;
         Ok(())
     }
+    
+    async fn delete_user_sessions(&self, user_id: &UserID) -> Result<(), RepositoryError> {
+        sqlx::query("DELETE FROM sessions WHERE user_id = $1")
+            .bind(user_id.as_ref())
+            .execute(&self.pool)
+            .await
+            .map_err(|e| RepositoryError::InternalError(format!("sqlx: {}", e.to_string())))?;
+        Ok(())
+    }
 }
 
 #[cfg(test)]

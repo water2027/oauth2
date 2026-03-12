@@ -2,6 +2,8 @@ use crate::context::identity::entity::session::Session;
 use crate::context::identity::service::session::SessionService;
 use crate::context::identity::service::user::UserService;
 use crate::context::identity::value_object::email::Email;
+use crate::context::identity::value_object::raw_password::RawPassword;
+use crate::context::identity::value_object::validation_code::ValidationCode;
 use super::super::error::DomainError;
 
 use super::command::{LoginCommand, RegisterCommand};
@@ -41,6 +43,20 @@ impl AuthAppService {
         let session = self.session_service.create_session(user.user_id).await?;
 
         Ok(session)
+    }
+    
+    pub async fn reset_password(&self, email: Email, new_pass: RawPassword, code: ValidationCode) -> Result<(), DomainError> {
+        if !self.code_service.verify_code(&email, &code).await? {
+            return Err(DomainError::InvalidValidationCode);
+        }
+        let user = self.user_service.find_user_by_email(email).await?;
+        if user.is_none() {
+            return Err(DomainError::UserNotFound);
+        }
+        let user = user.unwrap();
+        self.user_service.reset_password(&user.email, new_pass).await?;
+        self.session_service.revoke(&user.user_id).await?;
+        Ok(())
     }
     
     pub async fn logout(&self, cookie: &str) -> Result<(), DomainError> {

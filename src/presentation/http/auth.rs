@@ -41,6 +41,70 @@ pub struct LoginRequest {
 pub struct SessionResponse {
     pub user_id: String,
 }
+#[derive(Deserialize)]
+pub struct SendCodeRequest {
+    pub email: String,
+}
+
+#[derive(Deserialize)]
+pub struct ResetPasswordRequest {
+    pub email: String,
+    pub new_password: String,
+    pub password_confirm: String,
+    pub validation_code: String,
+}
+
+pub async fn send_code(
+    State(app_service): State<Arc<AuthAppService>>,
+    Json(payload): Json<SendCodeRequest>,
+) -> impl IntoResponse {
+    let email = match Email::parse(payload.email) {
+        Ok(em) => em,
+        Err(_) => return fail::<()>(StatusCode::BAD_REQUEST, 400, "邮箱格式错误").into_response(),
+    };
+
+    match app_service.send_validation_code(email).await {
+        Ok(_) => success(()).into_response(),
+        Err(e) => to_api_error::<()>(e).into_response(),
+    }
+}
+
+pub async fn reset_password(
+    State(app_service): State<Arc<AuthAppService>>,
+    Json(payload): Json<ResetPasswordRequest>,
+) -> impl IntoResponse {
+    if payload.new_password != payload.password_confirm {
+        return fail::<()>(StatusCode::BAD_REQUEST, 400, "两次输入的密码不一致").into_response();
+    }
+
+    let email = match Email::parse(payload.email) {
+        Ok(em) => em,
+        Err(_) => return fail::<()>(StatusCode::BAD_REQUEST, 400, "邮箱格式错误").into_response(),
+    };
+
+    let new_pass = match RawPassword::new(payload.new_password) {
+        Ok(pw) => pw,
+        Err(_) => return fail::<()>(StatusCode::BAD_REQUEST, 400, "密码格式错误").into_response(),
+    };
+
+    let code = match ValidationCode::new(payload.validation_code) {
+        Ok(vc) => vc,
+        Err(_) => return fail::<()>(StatusCode::BAD_REQUEST, 400, "验证码格式错误").into_response(),
+    };
+
+    match app_service.reset_password(email, new_pass, code).await {
+        Ok(_) => success(()).into_response(),
+        Err(e) => to_api_error::<()>(e).into_response(),
+    }
+}
+
+pub async fn me(
+    Extension(session): Extension<Session>,
+) -> impl IntoResponse {
+    success(SessionResponse {
+        user_id: session.user_id.as_ref().to_string(),
+    }).into_response()
+}
 
 pub async fn register(
     State(app_service): State<Arc<AuthAppService>>,

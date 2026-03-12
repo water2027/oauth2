@@ -22,6 +22,18 @@ impl UserService {
         Ok(user)
     }
     
+    pub async fn reset_password(&self, email: &Email, new_pass: RawPassword) -> Result<(), DomainError> {
+        let user = self.user_repository.find_by_email(&email).await?;
+        if let Some(mut user) = user {
+            let hashed_password = self.password_hasher.hash(new_pass)?;
+            user.password = hashed_password;
+            self.user_repository.save(&user).await?;
+            Ok(())
+        } else {
+            Err(DomainError::UserNotFound)
+        }
+    }
+    
     pub async fn can_create(&self, email: &Email, password: &RawPassword, password_confirm: &RawPassword) -> Result<(), DomainError> {
         if password != password_confirm {
             return Err(DomainError::PasswordMismatch);
