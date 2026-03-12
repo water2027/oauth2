@@ -60,4 +60,9 @@ impl AuthAppService {
         let session = self.session_service.verify_session(cookie).await?;
         Ok(session)
     }
+    
+    pub async fn refresh(&self, session: &mut Session) -> Result<(), DomainError> {
+        self.session_service.refresh_session(session).await?;
+        Ok(())
+    }
 }

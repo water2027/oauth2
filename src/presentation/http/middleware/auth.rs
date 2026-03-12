@@ -21,8 +21,8 @@ pub async fn auth_middleware(
     match cookie {
         Some(cookie) => {
             match app_service.verify(cookie.value()).await {
-                Ok(Some(session)) => {
-                    // 将 session 存入 extension，方便后续 handler 使用
+                Ok(Some(mut session)) => {
+                    app_service.refresh(&mut session).await.unwrap_or(());
                     req.extensions_mut().insert(session);
                     next.run(req).await
                 }
