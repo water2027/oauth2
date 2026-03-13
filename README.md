@@ -8,11 +8,11 @@
   - 发现文档和JWKS GET /.well-known/openid-configuration GET /jwks
   
 用户
-  - 同意/拒绝授权(验证参数, 生成code并重定向) GET /authorize + POST /authorize
   - 修改密码
   - 注册
   - 登录
-  - 修改个人信息
   - 发送邮件验证码
+  - 同意/拒绝授权(验证参数, 生成code并重定向) GET /authorize + POST /authorize
+  - 修改个人信息
   - 授权管理
   - 成为开发者
