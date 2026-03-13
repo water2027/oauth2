@@ -1,9 +1,9 @@
 use std::sync::Arc;
 use crate::context::identity::{
-    entity::session::Session,
+    entity::Session,
     error::DomainError,
     repository::session::ISessionRepository,
-    value_object::user_id::UserID,
+    value_object::UserID,
 };
 
 pub struct SessionService {

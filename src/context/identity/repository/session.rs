@@ -1,6 +1,6 @@
 use async_trait::async_trait;
-use super::super::entity::session::Session;
-use super::super::value_object::user_id::UserID;
+use super::super::entity::Session;
+use super::super::value_object::UserID;
 
 use crate::shared::error::RepositoryError;
 

@@ -1,6 +1,6 @@
 use super::super::service::password_hasher::{IPasswordHasher};
 use std::sync::Arc;
-use super::super::{entity::user::User, repository::user::{IUserRepository, IUserIDGenerator}, value_object::{email::Email, raw_password::RawPassword, username::Username}, error::DomainError};
+use super::super::{entity::User, repository::user::{IUserRepository, IUserIDGenerator}, value_object::{Email, RawPassword, Username}, error::DomainError};
 
 
 pub struct UserService {

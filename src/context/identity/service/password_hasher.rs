@@ -1,4 +1,4 @@
-use super::super::value_object::{hashed_password::HashedPassword, raw_password::RawPassword};
+use super::super::value_object::{HashedPassword, RawPassword};
 use super::super::error::DomainError;
 
 pub trait IPasswordHasher: Send + Sync {

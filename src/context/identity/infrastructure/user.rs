@@ -1,8 +1,8 @@
-use super::super::entity::user::User;
-use super::super::value_object::{email::Email, user_id::UserID};
+use super::super::entity::User;
+use super::super::value_object::{Email, UserID};
 use crate::context::identity::repository::user::{IUserIDGenerator, IUserRepository};
-use crate::context::identity::value_object::hashed_password::HashedPassword;
-use crate::context::identity::value_object::username::Username;
+use crate::context::identity::value_object::HashedPassword;
+use crate::context::identity::value_object::Username;
 use crate::shared::error::RepositoryError;
 use async_trait::async_trait;
 use uuid::Uuid;

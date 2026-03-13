@@ -1,7 +1,7 @@
 use crate::shared::error::{RepositoryError};
 use async_trait::async_trait;
-use super::super::value_object::{email::Email, validation_code::ValidationCode};
-use super::super::entity::validation_code::ValidationCodeRecord;
+use super::super::value_object::{Email, ValidationCode};
+use super::super::entity::ValidationCodeRecord;
 use super::super::error::DomainError;
 
 pub trait ICodeGenerator: Send + Sync {

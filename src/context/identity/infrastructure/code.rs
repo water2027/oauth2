@@ -5,8 +5,8 @@ use std::sync::Arc;
 use async_trait::async_trait;
 use rand::{self, RngExt};
 
-use super::super::value_object::{email::Email, validation_code::ValidationCode};
-use super::super::entity::validation_code::ValidationCodeRecord;
+use super::super::value_object::{Email, ValidationCode};
+use super::super::entity::ValidationCodeRecord;
 use super::super::error::DomainError;
 use super::super::repository::code::{ICodeRepository, ICodeSender, ICodeGenerator};
 use crate::shared::infrastructure::email::EmailSender;

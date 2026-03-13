@@ -4,9 +4,9 @@ use crate::context::identity::repository::code::{ICodeGenerator, ICodeSender};
 
 use super::super::{
     error::DomainError,
-    entity::validation_code::ValidationCodeRecord,
+    entity::ValidationCodeRecord,
     repository::code::ICodeRepository,
-    value_object::{email::Email, validation_code::ValidationCode}
+    value_object::{Email, ValidationCode}
 };
 
 

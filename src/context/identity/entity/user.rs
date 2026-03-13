@@ -1,4 +1,4 @@
-use super::super::value_object::{email::Email, hashed_password::HashedPassword, username::Username, user_id::UserID};
+use super::super::value_object::{Email, HashedPassword,Username, UserID};
 
 pub struct User {
     pub user_id: UserID,

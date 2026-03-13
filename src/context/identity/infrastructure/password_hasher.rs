@@ -2,7 +2,7 @@ use argon2::{
     password_hash::{rand_core::OsRng, PasswordHash, PasswordHasher, PasswordVerifier, SaltString},
     Argon2,
 };
-use crate::context::identity::value_object::{hashed_password::HashedPassword, raw_password::RawPassword};
+use crate::context::identity::value_object::{HashedPassword, RawPassword};
 use crate::context::identity::error::DomainError;
 use crate::context::identity::service::password_hasher::IPasswordHasher;
 

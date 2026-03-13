@@ -1,9 +1,9 @@
-use crate::context::identity::entity::session::Session;
+use crate::context::identity::entity::Session;
 use crate::context::identity::service::session::SessionService;
 use crate::context::identity::service::user::UserService;
-use crate::context::identity::value_object::email::Email;
-use crate::context::identity::value_object::raw_password::RawPassword;
-use crate::context::identity::value_object::validation_code::ValidationCode;
+use crate::context::identity::value_object::Email;
+use crate::context::identity::value_object::RawPassword;
+use crate::context::identity::value_object::ValidationCode;
 use super::super::error::DomainError;
 
 use super::command::{LoginCommand, RegisterCommand};

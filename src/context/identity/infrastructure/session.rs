@@ -1,7 +1,7 @@
 use async_trait::async_trait;
-use super::super::entity::session::Session;
+use super::super::entity::Session;
 
-use crate::{context::identity::{repository::session::ISessionRepository, value_object::user_id::UserID}, shared::{error::RepositoryError, utils::generate_random_string}};
+use crate::{context::identity::{repository::session::ISessionRepository, value_object::UserID}, shared::{error::RepositoryError, utils::generate_random_string}};
 
 pub struct SqlxSessionRepository {
     pool: sqlx::PgPool,

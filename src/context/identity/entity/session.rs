@@ -1,4 +1,4 @@
-use crate::context::identity::value_object::user_id::UserID;
+use crate::context::identity::value_object::UserID;
 
 const SESSION_MAX_AGE: i64 = 7 * 24 * 3600; // 7 days
 

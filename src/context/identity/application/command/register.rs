@@ -1,4 +1,4 @@
-use super::super::super::value_object::{email::Email, raw_password::RawPassword, username::Username, validation_code::ValidationCode};
+use super::super::super::value_object::{Email,RawPassword,Username,ValidationCode};
 
 pub struct RegisterCommand {
     pub username: Username,

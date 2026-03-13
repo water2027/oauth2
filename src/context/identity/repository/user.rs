@@ -1,5 +1,5 @@
-use super::super::entity::user::User;
-use super::super::value_object::{email::Email, user_id::UserID};
+use super::super::entity::User;
+use super::super::value_object::{Email, UserID};
 use crate::shared::error::RepositoryError;
 use async_trait::async_trait;
 

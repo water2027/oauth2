@@ -1,6 +1,6 @@
 use chrono::{DateTime, Utc, Duration};
 use serde::{Serialize, Deserialize};
-use super::super::value_object::{email::Email, validation_code::ValidationCode};
+use super::super::value_object::{Email, ValidationCode};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ValidationCodeRecord {
