@@ -3,6 +3,10 @@ use crate::shared::error::RepositoryError;
 
 #[derive(Error, Debug, PartialEq)]
 pub enum DomainError {
+    #[error("重定向地址数量错误")]
+    InvalidRedirectUriCount,
+    #[error("重定向地址不能超过5个")]
+    TooManyRedirectUri,
     #[error("重定向地址必须使用https或者localhost")]
     UnsafeRedirectUri,
     #[error("内部错误: {0}")]
