@@ -5,6 +5,8 @@ mod redirect_uri;
 mod auth_ticket;
 mod user_id;
 mod scope;
+mod pkce;
+mod authorization_code;
 
 pub use client_id::ClientID;
 pub use raw_secret::RawSecret;
@@ -13,3 +15,5 @@ pub use redirect_uri::RedirectUri;
 pub use auth_ticket::AuthTicket;
 pub use user_id::UserID;
 pub use scope::Scope;
+pub use pkce::PkceInfo;
+pub use authorization_code::AuthorizationCode;

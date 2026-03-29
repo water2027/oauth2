@@ -25,6 +25,8 @@ lettre = { version = "0.11", default-features = false, features = ["tokio1-rustl
 uuid = { version = "1.0", features = ["v4", "serde"] }
 axum-extra = { version = "0.12.5", features = ["cookie"] }
 time = "0.3.47"
+sha2 = "0.10.9"
+base64 = "0.22.1"
 
 [dev-dependencies]
 dotenvy = "0.15"
