@@ -1,37 +1,34 @@
-use std::sync::Arc;
 use std::env;
+use std::sync::Arc;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 // 基础设施与共享层
-use oauth2::shared::infrastructure::email::qq::QQEmailSender;
 use oauth2::context::identity::infrastructure::{
-    user::SqlxUserRepository,
-    session::SqlxSessionRepository,
-    code::RedisCodeRepository,
-    user::UUIDUserIDGenerator,
-    code::SimpleCodeGenerator,
-    code::EmailCodeSender,
-    password_hasher::Argon2PasswordHasher,
+    code::EmailCodeSender, code::RedisCodeRepository, code::SimpleCodeGenerator,
+    password_hasher::Argon2PasswordHasher, session::SqlxSessionRepository,
+    user::SqlxUserRepository, user::UUIDUserIDGenerator,
 };
+use oauth2::shared::infrastructure::email::qq::QQEmailSender;
 
 // 领域服务
 use oauth2::context::identity::service::{
-    user::UserService,
-    session::SessionService,
-    code::CodeService,
+    code::CodeService, session::SessionService, user::UserService,
 };
 
 // 应用服务
 use oauth2::context::identity::application::auth_app::AuthAppService;
 
 // 表现层 (Engine)
-use oauth2::presentation::{IHttpEngine, http::AxumHttpEngine};
+use oauth2::presentation::{http::AxumHttpEngine, IHttpEngine};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // 1. 初始化日志
     tracing_subscriber::registry()
-        .with(tracing_subscriber::EnvFilter::try_from_default_env().unwrap_or_else(|_| "oauth2=debug,tower_http=debug".into()))
+        .with(
+            tracing_subscriber::EnvFilter::try_from_default_env()
+                .unwrap_or_else(|_| "oauth2=debug,tower_http=debug".into()),
+        )
         .with(tracing_subscriber::fmt::layer())
         .init();
 
@@ -48,7 +45,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let user_repo = Arc::new(SqlxUserRepository::new(db_pool.clone()));
     let session_repo = Arc::new(SqlxSessionRepository::new(db_pool.clone()));
     let code_repo = Arc::new(RedisCodeRepository::new(redis_client));
-    
+
     let user_id_gen = Arc::new(UUIDUserIDGenerator);
     let code_gen = Arc::new(SimpleCodeGenerator);
     let password_hasher = Arc::new(Argon2PasswordHasher);
